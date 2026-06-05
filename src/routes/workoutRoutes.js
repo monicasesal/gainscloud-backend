@@ -7,4 +7,10 @@ router.post('/start', protect, workoutController.startWorkout)
 router.post('/set', protect, workoutController.logSet)
 router.post('/finish', protect, workoutController.finishWorkout)
 
+router.get('/history', protect, workoutController.getWorkoutHistory)
+router.get('/exercises/catalog', protect, workoutController.getAllExercises)
+
+router.delete('/set/:id', protect, workoutController.deleteSet)
+router.delete('/:id', protect, workoutController.deleteWorkoutLog)
+
 module.exports = router

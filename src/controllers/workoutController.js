@@ -109,8 +109,12 @@ exports.getWorkoutHistory = async (req, res) => {
             FROM workout_logs wl
             LEFT JOIN set_logs sl ON wl.id = sl.workout_log_id
             LEFT JOIN exercises e ON sl.exercise_id = e.id
-            WHERE wl.user_id = ? AND wl.status = 'completed'
-            ORDER BY wl.end_time DESC, e.name ASC, sl.id ASC
+            WHERE wl.user_id = ?
+            ORDER BY 
+                CASE WHEN wl.status = 'in progress' THEN 0 ELSE 1 END,
+                wl.start_time DESC,
+                e.name ASC, 
+                sl.id ASC
         `, [userId])
 
         //como SQL devuelve una fila por cada serie, lo agrupo en formato JSON estructurad
@@ -124,6 +128,7 @@ exports.getWorkoutHistory = async (req, res) => {
                     id: row.workout_log_id,
                     start_time: row.start_time,
                     end_time: row.end_time,
+                    status: row.status,
                     exercises: []
                 }
                 history.push(workout)
@@ -207,5 +212,74 @@ exports.deleteWorkoutLog = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar el entrenamiento completo', error)
         res.status(500).json({error: 'Error interno al eliminar el entrenamiento'})
+    }
+}
+
+exports.getWorkoutStats = async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        //CONSULTA 1: contar cuántos entrenamientos ha completado el usuario SOLO EN EL MES ACTUAL
+        const [workoutCount] = await db.query(`
+            SELECT COUNT(*) as totalWorkouts
+            FROM workout_logs
+            WHERE user_id = ?
+                AND status = 'completed'
+                AND MONTH(end_time) = MONTH(CURRENT_DATE())
+                AND YEAR(end_time) = YEAR(CURRENT_DATE())
+            `, [userId])
+
+        //CONSULTA 2: calcular el volumen total levantado (peso * reps) en todas sus series completadas SOLO EN EL MES ACTUAL
+        const [volumeResult] = await db.query(`
+            SELECT SUM(sl.weight * sl.reps) as totalVolume
+            FROM set_logs sl
+            JOIN workout_logs wl ON sl.workout_log_id = wl.id
+            WHERE wl.user_id = ? 
+                AND wl.status = 'completed'
+                AND MONTH(wl.end_time) = MONTH(CURRENT_DATE())
+                AND YEAR(wl.end_time) = YEAR(CURRENT_DATE())
+            `, [userId])
+
+            //CONSULTA 3: buscar si el usuario tiene una sesión activa en segundo plano
+            //traer el id de la más reciente si por error tiene mas de una
+            const [activeSession] = await db.query(
+                `SELECT id FROM workout_logs WHERE user_id = ? AND status = 'in progress' ORDER BY start_time DESC LIMIT 1`,
+                [userId]
+            )
+
+            //extraer los valores
+            const totalWorkouts = workoutCount[0].totalWorkouts || 0
+            const totalVolume = volumeResult[0].totalVolume || 0
+            const activeWorkoutId = activeSession.length > 0 ? activeSession[0].id : null
+
+            res.json({totalWorkouts, totalVolume, activeWorkoutId})
+    } catch (error) {
+        console.error("Error al obtener las estadísticas:", error)
+        res.status(500).json({error: "Error interno al calcular las estadísticas"})
+    }
+}
+
+//obtener volumen para el gráfico
+exports.getVolumeProgression = async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        //volumen total agrupado por cada día de entrenamiento de los últimos meses
+        const [rows] = await db.query(`
+            SELECT 
+                DATE_FORMAT(wl.end_time, '%d/%m') as fecha,
+                SUM(sl.weight * sl.reps) as volumenTotal
+            FROM set_logs sl
+            JOIN workout_logs wl ON sl.workout_log_id = wl.id
+            WHERE wl.user_id = ? AND wl.status = 'completed'
+            GROUP BY DATE(wl.end_time), wl.end_time
+            ORDER BY wl.end_time ASC
+            LIMIT 15
+        `, [userId])
+
+        res.json(rows)
+    } catch (error) {
+        console.error("Error al obtener la progresión de volumen:", error)
+        res.status(500).json({error: "Error interno al procesar los datos del gráfico"})
     }
 }

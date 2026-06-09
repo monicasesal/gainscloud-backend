@@ -8,7 +8,9 @@ router.post('/set', protect, workoutController.logSet)
 router.post('/finish', protect, workoutController.finishWorkout)
 
 router.get('/history', protect, workoutController.getWorkoutHistory)
+router.get ('/stats', protect, workoutController.getWorkoutStats)
 router.get('/exercises/catalog', protect, workoutController.getAllExercises)
+router.get('/volume-progression', protect, workoutController.getVolumeProgression)
 
 router.delete('/set/:id', protect, workoutController.deleteSet)
 router.delete('/:id', protect, workoutController.deleteWorkoutLog)

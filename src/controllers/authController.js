@@ -85,3 +85,38 @@ exports.login = async (req, res) => {
         res.status(500).json({error: 'Error en el servidor al iniciar sesión'})
     }
 }
+
+//3.ACTUALIZAR EL PESO CORPORAL DEL USUARIO
+exports.updateWeight = async (req, res) => {
+    const userId = req.user.id
+    const {weight} = req.body
+
+    if (!weight || isNaN(weight) || weight <= 0) {
+        return res.status(400).json({error: "Por favor, introduce un peso válido mayor que 0"})
+    }
+
+    try {
+        await db.query('UPDATE users SET weight = ? WHERE id = ?', [weight, userId])
+        res.json({message: 'Peso actualizado correctamente:', weight})
+    } catch (error) {
+        console.error("Error al actualizar el peso:", error)
+        res.status(500).json({error: "Error interno del servidor"})
+    }
+}
+
+//4.OBTENER LOS DATOS DEL PERFIL DEL USUARIO
+exports.getProfileData = async (req, res) => {
+    const userId = req.user.id
+
+    try {
+        const [rows] = await db.query(`SELECT username, email, weight, created_at FROM users WHERE id = ?`, [userId])
+        if (rows.length === 0) {
+            return res.status(404).json({error: "Usuario no encontrado"})
+        }
+
+        res.json(rows[0])
+    } catch (error) {
+        console.error("Error al obtener datos del perfil:", error)
+        res.status(500).json({error: "Error interno del servidor"})
+    }
+}

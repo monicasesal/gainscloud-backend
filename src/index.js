@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 require('dotenv').config()
@@ -6,6 +7,7 @@ const authRoutes = require('./routes/authRoutes')
 const exerciseRoutes = require('./routes/exerciseRoutes')
 const routineRoutes = require('./routes/routineRoutes')
 const workoutRoutes = require('./routes/workoutRoutes')
+const aiRoutes = require('./routes/aiRoutes')
 const app = express()
 
 //Middlewares básicos
@@ -16,6 +18,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/exercises', exerciseRoutes)
 app.use('/api/routines', routineRoutes)
 app.use('/api/workouts', workoutRoutes)
+app.use('/api/ai', aiRoutes)
 
 
 //Función para arrancar el servidor comprobando primero la conexión a la base de datos

@@ -120,3 +120,28 @@ exports.getProfileData = async (req, res) => {
         res.status(500).json({error: "Error interno del servidor"})
     }
 }
+
+//5.PLAN PREMIUM VS FREE
+exports.updatePlan = async (req, res) => {
+    const userId = req.user.id
+    const {newPlan} = req.body
+
+    if (!['free', 'premium'].includes(newPlan)) {
+        return res.status(400).json({error: 'Plan no válido'});
+    }
+
+    try {
+        await db.query('UPDATE users SET plan_type = ? WHERE id = ?', [newPlan, userId])
+
+        //Buscar los datos actualizados del usuario para devolvérselos al Front
+        const [rows] = await db.query('SELECT id, username, email, plan_type FROM users WHERE id = ?', [userId])
+        
+        res.json({
+            mensaje: `Plan actualizado a ${newPlan}`,
+            user: rows[0]
+        })
+    } catch (error) {
+        console.error('Error al actualizar el plan:', error)
+        res.status(500).json({error: 'Error en el servidor al cambiar de plan'})
+    }
+};

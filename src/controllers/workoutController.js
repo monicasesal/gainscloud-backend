@@ -185,18 +185,7 @@ exports.deleteSet = async (req, res) => {
     }
 }
 
-//6.TRAER TODOS LOS EJS
-exports.getAllExercises = async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT id, name FROM exercises ORDER BY name ASC')
-        res.json(rows)
-    } catch (error) {
-        console.error("Error al obtener el catálogo de ejercicios:", error)
-        res.status(500).json({error: 'Error al obtener los ejercicios'})
-    }
-}
-
-//7. ELIMINAR ENTRENAMIENTO COMPLETO
+//6. ELIMINAR ENTRENAMIENTO COMPLETO
 exports.deleteWorkoutLog = async (req, res) => {
     const {id} = req.params
     try {
@@ -215,6 +204,7 @@ exports.deleteWorkoutLog = async (req, res) => {
     }
 }
 
+//7.ESTADISTICAS
 exports.getWorkoutStats = async (req, res) => {
     const userId = req.user.id
 
@@ -259,7 +249,7 @@ exports.getWorkoutStats = async (req, res) => {
     }
 }
 
-//obtener volumen para el gráfico
+//8.obtener volumen para el gráfico
 exports.getVolumeProgression = async (req, res) => {
     const userId = req.user.id;
 

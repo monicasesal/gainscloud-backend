@@ -7,6 +7,7 @@ router.post('/register', authController.register)
 router.post('/login', authController.login)
 
 router.put('/update-weight', protect, authController.updateWeight)
+router.put('/update-plan', protect, authController.updatePlan)
 
 router.get('/profile', protect, authController.getProfileData)
 

@@ -27,17 +27,3 @@ exports.protect = (req, res, next) => {
     }
 }
 
-//2. CONTROLADOR DE PLANES
-//función dinámica pasándole los planes permitidos (ej: 'premium')
-exports.restricTo = (...allowedPlans) => {
-    return (req, res, next) => {
-        //req.user ya existe porque este middleware siempre irá después de 'protect'
-        if (!allowedPlans.includes(req.user.plan_type)) {
-            return res.status(403).json({
-                error: 'Acceso denegado, esta función requiere un plan superior'
-            })
-        }
-        next() //tiene el plan correcto y puede pasar
-    }
-}
-

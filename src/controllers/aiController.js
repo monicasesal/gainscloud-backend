@@ -44,9 +44,9 @@ exports.getCoachFeedback = async (req, res) => {
             ${dataTrainingText}
 
             Tu respuesta debe estructurarse estrictamente en estos 3 puntos:
-            Análisis de Carga y Volumen: Identifica si ha subido de peso en algún ejercicio o si mantiene un buen volumen de trabajo.
-            Puntos Fuertes o Estancamientos: Felicítale por sus ejercicios más fuertes o adviértele amablemente si algún ejercicio se ve estancado en peso/reps.
-            Consejo del Ciber-Coach: Dale un consejo táctico para la próxima semana (ej. aplicar sobrecarga progresiva, variar repeticiones, o pautas de descanso).
+            **Análisis de Carga y Volumen**: Identifica si ha subido de peso en algún ejercicio o si mantiene un buen volumen de trabajo.
+            **Puntos Fuertes o Estancamientos**: Felicítale por sus ejercicios más fuertes o adviértele amablemente si algún ejercicio se ve estancado en peso/reps.
+            **Consejo del Ciber-Coach**: Dale un consejo táctico para la próxima semana (ej. aplicar sobrecarga progresiva, variar repeticiones, o pautas de descanso).
 
             Sé directo, habla en segunda persona, mantén un tono profesional, enérgico y fitness. No uses introducciones largas. Máximo 3 párrafos cortos en total.
         `

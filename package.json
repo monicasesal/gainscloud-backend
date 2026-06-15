@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "jest": "jest"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,8 @@
     "mysql2": "^3.22.3"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   }
 }

@@ -24,7 +24,8 @@ Este enlace corresponde al servidor de la API REST. Si accedes directamente desd
 
 El proyecto sigue el patrón de diseño arquitectónico de controladores y rutas para garantizar la separación de responsabilidades y facilitar la escalabilidad del código:
 
-```gainscloud-back/
+```text
+gainscloud-back/
 ├── src/
 │   ├── config/
 │   │   ├── db.js           
@@ -48,7 +49,8 @@ El proyecto sigue el patrón de diseño arquitectónico de controladores y rutas
 │   └── index.js
 ├── .env
 ├── package.json
-└── README.md```
+└── README.md
+```
 
 ## Endpoints API
 

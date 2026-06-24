@@ -11,10 +11,18 @@ exports.register = async (req, res) => {
         return res.status(400).json({error: "Todos los campos son obligatorios"})
     }
 
+    //Contraseña robusta
+    const validPassword = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/ //mínimo 8 caracteres, al menos una letra y un número, permite símbolos
+    if (!validPassword.test(password)) {
+        return res.status(400).json({
+            error: "La contraseña es demasiado débil. Debe tener al menos 8 caracteres, incluir al menos una letra y un número"
+        })
+    }
+
     try {
         //Verificar si el email ya existe en la base de datos
         const [existingUser] = await db.query('SELECT * FROM users WHERE email = ?', [email])
-        if (existingUser > 0) {
+        if (existingUser.length > 0) {
             return res.status(400).json([{error: 'El correo electrónico ya está registrado'}])
         }
 
@@ -124,10 +132,15 @@ exports.getProfileData = async (req, res) => {
 //5.PLAN PREMIUM VS FREE
 exports.updatePlan = async (req, res) => {
     const userId = req.user.id
-    const {newPlan} = req.body
+    const {newPlan, promoCode} = req.body
 
     if (!['free', 'premium'].includes(newPlan)) {
         return res.status(400).json({error: 'Plan no válido'});
+    }
+
+    //Si intenta ser premium, obligar a que use el código secreto
+    if (newPlan === 'premium' && promoCode === 'GAINSCLOUD2026') {
+        return res.status(403).json({error: 'Acceso denegado. Para activar el plan Premium de demostración, introduce el código promocional válido.'})
     }
 
     try {

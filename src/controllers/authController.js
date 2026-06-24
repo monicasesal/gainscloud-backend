@@ -139,8 +139,8 @@ exports.updatePlan = async (req, res) => {
     }
 
     //Si intenta ser premium, obligar a que use el código secreto
-    if (newPlan === 'premium' && promoCode === 'GAINSCLOUD2026') {
-        return res.status(403).json({error: 'Acceso denegado. Para activar el plan Premium de demostración, introduce el código promocional válido.'})
+    if (newPlan === 'premium' && promoCode !== 'GAINSCLOUD2026') {
+        return res.status(403).json({error: 'Error. Acceso denegado. Para activar el plan Premium de demostración, introduce el código promocional válido.'})
     }
 
     try {

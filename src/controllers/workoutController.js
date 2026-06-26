@@ -7,7 +7,7 @@ exports.startWorkout = async (req, res) => {
 
     try {
         const [result] = await db.query(
-            'INSERT INTO workout_logs (user_id, routine_id, status) VALUES (?, ?, "in progress")',
+            'INSERT INTO workout_logs (user_id, routine_id, status, start_time) VALUES (?, ?, "in progress", CURRENT_TIMESTAMP)',
             [userId, routine_id || null]
         )
 
@@ -271,5 +271,28 @@ exports.getVolumeProgression = async (req, res) => {
     } catch (error) {
         console.error("Error al obtener la progresión de volumen:", error)
         res.status(500).json({error: "Error interno al procesar los datos del gráfico"})
+    }
+}
+
+//9. Obtener workout por su ID
+exports.getWorkoutById = async (req, res) => {
+    const { id } = req.params
+    const userId = req.user.id
+
+    try {
+        const [rows] = await db.query(
+            `SELECT id, start_time, status 
+             FROM workout_logs 
+             WHERE id = ? AND user_id = ?`,
+            [id, userId]
+        )
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "Workout no encontrado" })
+        }
+
+        res.json(rows[0])
+    } catch (error) {
+        res.status(500).json({ error: "Error al obtener workout" })
     }
 }
